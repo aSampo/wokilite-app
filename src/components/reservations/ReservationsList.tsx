@@ -1,20 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { useReservations } from "@/hooks/useReservations";
+import { SectorFilter } from "./SectorFilter";
+import { SectorSection } from "./SectorSection";
+import { useReservationsGrouping } from "@/hooks/useReservationsGrouping";
+import type { Sector } from "@/lib/api/restaurants";
 
 interface ReservationsListProps {
   restaurantId: string;
   date: string;
+  sectors: Sector[];
 }
 
 export function ReservationsList({
   restaurantId,
   date,
+  sectors,
 }: ReservationsListProps) {
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+
   const { data, isLoading, error } = useReservations({
     restaurantId,
     date,
+    sectorId: selectedSector || undefined,
   });
+
+  const { sectorIds, reservationsBySector } = useReservationsGrouping(data);
+
+  const getSectorName = (sectorId: string) => {
+    return sectors.find((s) => s.id === sectorId)?.name || sectorId;
+  };
 
   if (isLoading) {
     return <div className="text-zinc-600">Cargando reservas...</div>;
@@ -32,57 +48,39 @@ export function ReservationsList({
     return null;
   }
 
+  const sectorsToDisplay = selectedSector
+    ? [selectedSector]
+    : Object.keys(reservationsBySector).sort();
+
+  const totalReservations = data?.items.length || 0;
+
   return (
-    <div className="space-y-4">
-      {data.items.length > 0 && (
-        <p className="text-zinc-600">Total de reservas: {data.items.length}</p>
-      )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <p className="text-zinc-600">Total de reservas: {totalReservations}</p>
+        {sectors.length > 0 && (
+          <SectorFilter
+            sectors={sectors}
+            selectedSector={selectedSector}
+            onSectorChange={setSelectedSector}
+          />
+        )}
+      </div>
 
       {data.items.length === 0 ? (
         <p className="text-zinc-500 italic">No hay reservas para este día</p>
       ) : (
-        <div className="space-y-3">
-          {data.items.map((reservation) => (
-            <div
-              key={reservation.id}
-              className="border border-zinc-200 rounded-lg p-4"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-lg">
-                    {reservation.customer.name}
-                  </p>
-                  <p className="text-zinc-600">
-                    {reservation.partySize}{" "}
-                    {reservation.partySize === 1 ? "persona" : "personas"}
-                  </p>
-                  <p className="text-sm text-zinc-500">
-                    {new Date(reservation.start).toLocaleTimeString("es-AR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}{" "}
-                    -{" "}
-                    {new Date(reservation.end).toLocaleTimeString("es-AR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-zinc-600">
-                    {reservation.tableIds.length === 1 ? "Mesa" : "Mesas"}:{" "}
-                    {reservation.tableIds.join(", ")}
-                  </p>
-                  <p className="text-xs text-zinc-500 mt-1">
-                    {reservation.status}
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="space-y-6">
+          {sectorsToDisplay.map((sectorId) => (
+            <SectorSection
+              key={sectorId}
+              sectorId={sectorId}
+              sectorName={getSectorName(sectorId)}
+              reservations={reservationsBySector[sectorId] || []}
+            />
           ))}
         </div>
       )}
     </div>
   );
 }
-
