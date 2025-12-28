@@ -26,7 +26,7 @@ export function ReservationsList({
     sectorId: selectedSector || undefined,
   });
 
-  const { sectorIds, reservationsBySector } = useReservationsGrouping(data);
+  const { reservationsBySector } = useReservationsGrouping(data);
 
   const getSectorName = (sectorId: string) => {
     return sectors.find((s) => s.id === sectorId)?.name || sectorId;
