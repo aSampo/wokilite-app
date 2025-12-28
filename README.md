@@ -1,78 +1,249 @@
-# WokiLite App - Frontend
+# WokiLite Frontend
 
-Restaurant reservation management dashboard built with Next.js 16 and TanStack Query.
+Modern frontend for the WokiLite restaurant reservation system built with Next.js 16, React 19, and TypeScript.
 
-## Tech Stack
+## 🌐 Live Demo
 
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type safety
-- **TanStack Query** - Data fetching and caching
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - UI components
-- **date-fns** - Date manipulation
+**Frontend:** [https://wokilite-app.vercel.app/](https://wokilite-app.vercel.app/)  
+**Backend API:** [https://wokilite-reservations-production.up.railway.app](https://wokilite-reservations-production.up.railway.app/health)
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-
-### Installation
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
 npm install
+
+# Set environment variable
+echo "NEXT_PUBLIC_API_URL=https://wokilite-reservations-production.up.railway.app" > .env.local
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+npm start
 ```
 
-### Environment Variables
+## ✨ Features
 
-Create a `.env.local` file in the root directory:
+### Core Functionality
+
+- **Day View with Date Navigation** - Browse reservations with prev/next buttons and calendar picker
+- **Sector Grouping** - Reservations organized by sectors (Main Hall, Terrace) with visual separation
+- **Server-Side Filtering** - Filter by sector using backend API for better performance
+- **Real-Time Updates** - Automatic cache invalidation with TanStack Query
+- **Toast Notifications** - Non-intrusive feedback with Sonner
+
+### Smart Reservation Management
+
+- **Create Test Reservations** - One-click creation with automatic availability checking
+- **Intelligent Sector Retry** - Tries all sectors until finding availability
+- **Delete Reservations** - Remove reservations with confirmation dialog
+
+## 🛠 Tech Stack
+
+- **Next.js 16.1** - React framework with App Router and Server Components
+- **React 19** - Latest React with improved concurrent features
+- **TypeScript 5** - Type safety
+- **Tailwind CSS 4** - Utility-first styling
+- **shadcn/ui** - Accessible component library (Calendar, Select, Dialog, Toast)
+- **TanStack Query v5** - Server state management with caching
+- **date-fns** - Date manipulation with timezone support
+
+### Key Design Decisions
+
+#### Server Components + Client Components
+
+- Restaurant info fetched server-side for better performance and SEO
+- Date selection and filtering handled in client components
+- Less JavaScript sent to client
+
+#### TanStack Query for Caching
+
+- Automatic caching by `[restaurantId, date, sectorId]`
+- Smart invalidation on create/delete
+- Built-in loading and error states
+
+#### Server-Side Filtering
+
+- Pass `sectorId` to backend instead of filtering client-side
+- Reduces network payload
+- Better scalability with large datasets
+
+#### Smart Reservation Creation
+
+1. Generate random party size (2-8 people)
+2. Shuffle sectors randomly
+3. For each sector:
+   - Check availability
+   - If slot found → Create reservation
+   - If not → Try next sector
+4. If no sector has space → Show error
+
+#### Delete with Confirmation
+
+- Hover to reveal delete button (trash icon)
+- AlertDialog for confirmation
+- Shows customer name to prevent mistakes
+- Loading state during deletion
+- Toast notification on success/error
+
+## 🎯 BONUS Features Implemented
+
+### BONUS 1: Frontend Demo ✅
+
+- ✅ Day view grouped by sector with visual separation
+- ✅ Date navigation (prev/next + calendar picker)
+- ✅ Live updates on date change
+- ✅ Create random/sample reservation button
+- ✅ Delete reservation with confirmation
+- ✅ Smart availability checking with sector retry
+- ✅ Sector filtering with server-side support
+- ✅ Toast notifications
+
+### BONUS 2: Public Deploy ✅
+
+- Deployed on Vercel: [https://wokilite-app.vercel.app/](https://wokilite-app.vercel.app/)
+- Automatic deployments from main branch
+- Environment variables configured
+- Production-ready build
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── layout.tsx           # Root layout with providers
+│   ├── page.tsx             # Home page (Server Component)
+│   └── globals.css          # Global styles
+├── components/
+│   ├── reservations/
+│   │   ├── ReservationCard.tsx              # Single reservation + delete button
+│   │   ├── ReservationsList.tsx             # Main list orchestration
+│   │   ├── ReservationsView.tsx             # Client wrapper with date state
+│   │   ├── SectorFilter.tsx                 # Sector dropdown
+│   │   ├── SectorSection.tsx                # Sector grouping
+│   │   ├── CreateRandomReservationButton.tsx
+│   │   └── DeleteReservationDialog.tsx      # Confirmation modal
+│   └── ui/                  # shadcn/ui components
+├── hooks/
+│   ├── useReservations.ts                   # Fetch reservations
+│   ├── useReservationsGrouping.ts           # Group by sector
+│   ├── useCreateRandomReservation.ts        # Smart creation
+│   └── useDeleteReservation.ts              # Delete with toast
+├── lib/
+│   ├── api/
+│   │   ├── client.ts                        # Base API client
+│   │   ├── reservations.ts                  # GET /reservations/day
+│   │   ├── restaurants.ts                   # GET /restaurants/info
+│   │   ├── availability.ts                  # GET /availability
+│   │   ├── create-reservation.ts            # POST /reservations
+│   │   └── delete-reservation.ts            # DELETE /reservations/:id
+│   └── utils/
+│       ├── random-data.ts                   # Random customer generator
+│       └── utils.ts                         # cn() helper
+├── providers/
+│   └── query-provider.tsx   # TanStack Query setup
+└── types/
+    ├── api.types.ts         # API response types
+    └── reservation.types.ts # Domain types
+```
+
+## 🔌 API Integration
+
+### Endpoints Used
+
+```typescript
+// GET /restaurants/info - Fetched server-side
+const restaurantInfo = await getRestaurantInfo("R1");
+
+// GET /reservations/day - Fetched client-side with caching
+const { data } = useReservations({ restaurantId, date, sectorId });
+
+// GET /availability - Used when creating reservations
+const availability = await getAvailability({
+  restaurantId,
+  sectorId,
+  date,
+  partySize,
+});
+
+// POST /reservations - Create with idempotency key
+await createReservation({
+  restaurantId,
+  sectorId,
+  partySize,
+  startDateTimeISO,
+  customer,
+});
+
+// DELETE /reservations/:id - Soft delete
+await deleteReservation(reservationId);
+```
+
+## 🧪 Testing
+
+### Manual Testing Workflow
+
+1. **Date Navigation** - Click prev/next, select from calendar, verify updates
+2. **Sector Filtering** - Select sector, verify only that sector shows
+3. **Create Reservation** - Click button, verify loading, check toast, confirm in list
+4. **Delete Reservation** - Hover card, click trash, confirm dialog, verify removal
+5. **Timezone** - Create for today, verify appears on correct date
+
+## 🔧 Environment Variables
 
 ```bash
 NEXT_PUBLIC_API_URL=https://wokilite-reservations-production.up.railway.app
 ```
 
-### Development
+## 🚀 Deployment
+
+Deployed on **Vercel** with automatic deployments from main branch.
 
 ```bash
-npm run dev
+# Deploy to Vercel
+vercel
+
+# Set environment variable
+vercel env add NEXT_PUBLIC_API_URL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## 🎨 UI/UX Highlights
 
-### Build
+- **Responsive Grid** - 1-4 columns based on screen size
+- **Hover Effects** - Delete button appears on hover
+- **Visual Hierarchy** - Sector sections with gradient backgrounds
+- **Accessibility** - Keyboard navigation, ARIA labels, focus management
+- **Loading States** - Spinners and disabled states during operations
 
-```bash
-npm run build
-npm start
-```
+## 🧰 Tools & Credits
 
-## API
+- **shadcn/ui** - Component library
+- **TanStack Query** - Server state management
+- **date-fns** - Date manipulation
+- **Sonner** - Toast notifications
+- **Lucide React** - Icons
+- **Cursor AI** - Development assistance
 
-Backend API is deployed on Railway: [https://wokilite-reservations-production.up.railway.app](https://wokilite-reservations-production.up.railway.app/health)
+## 📝 Known Limitations
 
-## Project Structure
+- No time-slot filter (shows all reservations for the day)
+- No authentication (public access)
+- Single restaurant support (hardcoded "R1")
+- No offline support
+- UI in Spanish only
 
-```
-src/
-├── app/              # Next.js app router pages
-├── components/       # React components
-│   └── ui/          # shadcn/ui components
-├── hooks/           # React Query hooks
-├── lib/
-│   └── api/         # API client layer
-├── providers/       # React context providers
-└── types/           # TypeScript type definitions
-```
+## 🚧 Future Improvements
 
-## Features
+- Add time-slot filter
+- Implement authentication
+- Add reservation editing
+- Multi-restaurant support
+- Loading skeletons
+- Floor-plan visualization
+- Export to PDF/CSV
 
-- [x] List reservations by day
-- [ ] Filter by sector
-- [ ] Create reservations
-- [ ] Delete reservations
-- [ ] Real-time updates
+## 📄 License
 
-## License
-
-MIT
+This project is part of the WokiLite challenge.

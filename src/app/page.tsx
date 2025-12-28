@@ -1,5 +1,15 @@
+import { Metadata } from "next";
 import { getRestaurantInfo } from "@/lib/api/restaurants";
 import { ReservationsView } from "@/components/reservations/ReservationsView";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const restaurantInfo = await getRestaurantInfo("R1");
+
+  return {
+    title: `${restaurantInfo.restaurant.name} - Reservas`,
+    description: `Sistema de gestión de reservas para ${restaurantInfo.restaurant.name}`,
+  };
+}
 
 export default async function Home() {
   const restaurantInfo = await getRestaurantInfo("R1");
@@ -10,7 +20,7 @@ export default async function Home() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-zinc-900">
-              {restaurantInfo.restaurant.name}
+              {restaurantInfo.restaurant.name} - Reservas
             </h1>
           </div>
         </div>

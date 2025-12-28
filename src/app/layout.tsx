@@ -15,7 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WokiLite - Sistema de Reservas",
+  title: {
+    template: "%s | WokiLite",
+    default: "WokiLite - Sistema de Reservas",
+  },
   description: "Sistema de gestión de reservas para restaurantes",
 };
 
@@ -30,7 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>{children}</QueryProvider>
-        <Toaster />
+        <Toaster
+          toastOptions={{
+            classNames: {
+              description: "!text-gray-900",
+            },
+          }}
+        />
       </body>
     </html>
   );
