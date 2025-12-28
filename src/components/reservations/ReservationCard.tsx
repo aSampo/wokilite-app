@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDeleteReservation } from "@/hooks/useDeleteReservation";
 import { DeleteReservationDialog } from "./DeleteReservationDialog";
+import { formatTime24h } from "@/lib/utils/time-format";
 import type { ReservationItem } from "@/types/api.types";
 
 interface ReservationCardProps {
@@ -49,15 +50,8 @@ export function ReservationCard({ reservation }: ReservationCardProps) {
 
           <div className="text-xs text-zinc-500 space-y-1">
             <p className="font-medium">
-              {new Date(reservation.start).toLocaleTimeString("es-AR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
-              -{" "}
-              {new Date(reservation.end).toLocaleTimeString("es-AR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {formatTime24h(reservation.start)} -{" "}
+              {formatTime24h(reservation.end)}
             </p>
             <p>
               {reservation.tableIds.length === 1 ? "Mesa" : "Mesas"}:{" "}

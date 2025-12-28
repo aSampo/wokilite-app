@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import { useReservations } from "@/hooks/useReservations";
-import { SectorFilter } from "./SectorFilter";
 import { SectorSection } from "./SectorSection";
+import { ReservationsHeader } from "./ReservationsHeader";
+import { EmptyReservationsMessage } from "./EmptyReservationsMessage";
+import { LoadingState } from "./LoadingState";
+import { ErrorState } from "./ErrorState";
 import { useReservationsGrouping } from "@/hooks/useReservationsGrouping";
+import { useReservationsTimeFiltering } from "@/hooks/useReservationsTimeFiltering";
 import type { Sector } from "@/lib/api/restaurants";
 
 interface ReservationsListProps {
@@ -19,6 +23,8 @@ export function ReservationsList({
   sectors,
 }: ReservationsListProps) {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
 
   const { data, isLoading, error } = useReservations({
     restaurantId,
@@ -26,22 +32,27 @@ export function ReservationsList({
     sectorId: selectedSector || undefined,
   });
 
-  const { reservationsBySector } = useReservationsGrouping(data);
+  const filteredReservations = useReservationsTimeFiltering({
+    reservations: data?.items || [],
+    startTime,
+    endTime,
+  });
+
+  const { reservationsBySector } = useReservationsGrouping({
+    date: data?.date || date,
+    items: filteredReservations,
+  });
 
   const getSectorName = (sectorId: string) => {
     return sectors.find((s) => s.id === sectorId)?.name || sectorId;
   };
 
   if (isLoading) {
-    return <div className="text-zinc-600">Cargando reservas...</div>;
+    return <LoadingState />;
   }
 
   if (error) {
-    return (
-      <div className="text-red-600">
-        Error: {error instanceof Error ? error.message : "Error desconocido"}
-      </div>
-    );
+    return <ErrorState error={error} />;
   }
 
   if (!data) {
@@ -52,23 +63,24 @@ export function ReservationsList({
     ? [selectedSector]
     : Object.keys(reservationsBySector).sort();
 
-  const totalReservations = data?.items.length || 0;
+  const totalReservations = filteredReservations.length;
+  const hasReservations = data.items.length > 0;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-zinc-600">Total de reservas: {totalReservations}</p>
-        {sectors.length > 0 && (
-          <SectorFilter
-            sectors={sectors}
-            selectedSector={selectedSector}
-            onSectorChange={setSelectedSector}
-          />
-        )}
-      </div>
-
-      {data.items.length === 0 ? (
-        <p className="text-zinc-500 italic">No hay reservas para este día</p>
+      <ReservationsHeader
+        totalReservations={totalReservations}
+        sectors={sectors}
+        selectedSector={selectedSector}
+        onSectorChange={setSelectedSector}
+        reservations={data.items}
+        startTime={startTime}
+        endTime={endTime}
+        onStartTimeChange={setStartTime}
+        onEndTimeChange={setEndTime}
+      />
+      {filteredReservations.length === 0 ? (
+        <EmptyReservationsMessage hasReservations={hasReservations} />
       ) : (
         <div className="space-y-6">
           {sectorsToDisplay.map((sectorId) => (

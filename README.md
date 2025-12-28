@@ -5,7 +5,8 @@ Modern frontend for the WokiLite restaurant reservation system built with Next.j
 ## 🌐 Live Demo
 
 **Frontend:** [https://wokilite-app.vercel.app/](https://wokilite-app.vercel.app/)  
-**Backend API:** [https://wokilite-reservations-production.up.railway.app](https://wokilite-reservations-production.up.railway.app/health)
+**Backend API:** [https://wokilite-reservations-production.up.railway.app](https://wokilite-reservations-production.up.railway.app/health)  
+**Backend Repository:** [https://github.com/aSampo/wokilite-reservations](https://github.com/aSampo/wokilite-reservations)
 
 ## 🚀 Quick Start
 
@@ -31,8 +32,10 @@ npm start
 - **Day View with Date Navigation** - Browse reservations with prev/next buttons and calendar picker
 - **Sector Grouping** - Reservations organized by sectors (Main Hall, Terrace) with visual separation
 - **Server-Side Filtering** - Filter by sector using backend API for better performance
+- **Time Slot Filtering** - Filter reservations by time range (start/end) with 15-minute intervals
 - **Real-Time Updates** - Automatic cache invalidation with TanStack Query
 - **Toast Notifications** - Non-intrusive feedback with Sonner
+- **Loading & Error States** - Beautiful loading spinners and error alerts with shadcn/ui
 
 ### Smart Reservation Management
 
@@ -46,7 +49,7 @@ npm start
 - **React 19** - Latest React with improved concurrent features
 - **TypeScript 5** - Type safety
 - **Tailwind CSS 4** - Utility-first styling
-- **shadcn/ui** - Accessible component library (Calendar, Select, Dialog, Toast)
+- **shadcn/ui** - Accessible component library (Calendar, Select, Dialog, Toast, Alert)
 - **TanStack Query v5** - Server state management with caching
 - **date-fns** - Date manipulation with timezone support
 
@@ -88,12 +91,23 @@ npm start
 - Loading state during deletion
 - Toast notification on success/error
 
+#### Time Slot Filtering
+
+- Two dropdowns: start time and end time
+- **Dynamic slots**: only shows time slots that have actual reservations
+- Optional filtering: can filter by start only, end only, or both
+- Client-side filtering for instant feedback
+- Clear button to reset filters
+- Auto-hides when no reservations exist
+- Shows appropriate message when no reservations match the filter
+
 ## 🎯 BONUS Features Implemented
 
 ### BONUS 1: Frontend Demo ✅
 
 - ✅ Day view grouped by sector with visual separation
 - ✅ Date navigation (prev/next + calendar picker)
+- ✅ Time slot filtering (start/end time with 15-min intervals)
 - ✅ Live updates on date change
 - ✅ Create random/sample reservation button
 - ✅ Delete reservation with confirmation
@@ -121,10 +135,15 @@ src/
 │   │   ├── ReservationCard.tsx              # Single reservation + delete button
 │   │   ├── ReservationsList.tsx             # Main list orchestration
 │   │   ├── ReservationsView.tsx             # Client wrapper with date state
+│   │   ├── ReservationsHeader.tsx           # Header with filters
 │   │   ├── SectorFilter.tsx                 # Sector dropdown
 │   │   ├── SectorSection.tsx                # Sector grouping
+│   │   ├── TimeSlotFilter.tsx               # Time range filter
 │   │   ├── CreateRandomReservationButton.tsx
-│   │   └── DeleteReservationDialog.tsx      # Confirmation modal
+│   │   ├── DeleteReservationDialog.tsx      # Confirmation modal
+│   │   ├── LoadingState.tsx                 # Loading spinner
+│   │   ├── ErrorState.tsx                   # Error alert
+│   │   └── EmptyReservationsMessage.tsx      # Empty state message
 │   └── ui/                  # shadcn/ui components
 ├── hooks/
 │   ├── useReservations.ts                   # Fetch reservations
@@ -141,6 +160,7 @@ src/
 │   │   └── delete-reservation.ts            # DELETE /reservations/:id
 │   └── utils/
 │       ├── random-data.ts                   # Random customer generator
+│       ├── time-format.ts                   # 24h time formatting utilities
 │       └── utils.ts                         # cn() helper
 ├── providers/
 │   └── query-provider.tsx   # TanStack Query setup
@@ -215,7 +235,9 @@ vercel env add NEXT_PUBLIC_API_URL
 - **Hover Effects** - Delete button appears on hover
 - **Visual Hierarchy** - Sector sections with gradient backgrounds
 - **Accessibility** - Keyboard navigation, ARIA labels, focus management
-- **Loading States** - Spinners and disabled states during operations
+- **Loading States** - Animated spinners with lucide-react icons
+- **Error States** - Beautiful error alerts with shadcn/ui Alert component
+- **24-Hour Time Format** - Consistent time display across the app
 
 ## 🧰 Tools & Credits
 
@@ -228,21 +250,10 @@ vercel env add NEXT_PUBLIC_API_URL
 
 ## 📝 Known Limitations
 
-- No time-slot filter (shows all reservations for the day)
 - No authentication (public access)
 - Single restaurant support (hardcoded "R1")
 - No offline support
 - UI in Spanish only
-
-## 🚧 Future Improvements
-
-- Add time-slot filter
-- Implement authentication
-- Add reservation editing
-- Multi-restaurant support
-- Loading skeletons
-- Floor-plan visualization
-- Export to PDF/CSV
 
 ## 📄 License
 
