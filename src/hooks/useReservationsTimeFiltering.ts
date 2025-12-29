@@ -19,18 +19,21 @@ export function useReservationsTimeFiltering({
     }
 
     return reservations.filter((reservation) => {
-      const reservationTime = extractTimeFromISO(reservation.start);
+      const reservationStartTime = extractTimeFromISO(reservation.start);
+      const reservationEndTime = extractTimeFromISO(reservation.end);
 
       if (startTime && endTime) {
-        return reservationTime >= startTime && reservationTime < endTime;
+        return (
+          reservationStartTime >= startTime && reservationEndTime <= endTime
+        );
       }
 
       if (startTime) {
-        return reservationTime >= startTime;
+        return reservationStartTime >= startTime;
       }
 
       if (endTime) {
-        return reservationTime < endTime;
+        return reservationEndTime <= endTime;
       }
 
       return true;

@@ -18,12 +18,23 @@ interface TimeSlotFilterProps {
   onEndTimeChange: (time: string | null) => void;
 }
 
-function extractTimeSlots(reservations: ReservationItem[]): string[] {
+function extractStartTimeSlots(reservations: ReservationItem[]): string[] {
   const timesSet = new Set<string>();
 
   reservations.forEach((reservation) => {
     const startTime = extractTimeFromISO(reservation.start);
     timesSet.add(startTime);
+  });
+
+  return Array.from(timesSet).sort();
+}
+
+function extractEndTimeSlots(reservations: ReservationItem[]): string[] {
+  const timesSet = new Set<string>();
+
+  reservations.forEach((reservation) => {
+    const endTime = extractTimeFromISO(reservation.end);
+    timesSet.add(endTime);
   });
 
   return Array.from(timesSet).sort();
@@ -36,9 +47,10 @@ export function TimeSlotFilter({
   onStartTimeChange,
   onEndTimeChange,
 }: TimeSlotFilterProps) {
-  const availableSlots = extractTimeSlots(reservations);
+  const startTimeSlots = extractStartTimeSlots(reservations);
+  const endTimeSlots = extractEndTimeSlots(reservations);
 
-  if (availableSlots.length === 0) {
+  if (startTimeSlots.length === 0 && endTimeSlots.length === 0) {
     return null;
   }
 
@@ -55,7 +67,7 @@ export function TimeSlotFilter({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Desde (todas)</SelectItem>
-          {availableSlots.map((time) => (
+          {startTimeSlots.map((time) => (
             <SelectItem key={time} value={time}>
               {time}
             </SelectItem>
@@ -76,7 +88,7 @@ export function TimeSlotFilter({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Hasta (todas)</SelectItem>
-          {availableSlots.map((time) => (
+          {endTimeSlots.map((time) => (
             <SelectItem key={time} value={time}>
               {time}
             </SelectItem>
