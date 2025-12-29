@@ -1,6 +1,6 @@
 # WokiLite Frontend
 
-Modern frontend for the WokiLite restaurant reservation system built with Next.js 16, React 19, and TypeScript.
+Frontend for the WokiLite restaurant reservation system built with Next.js 16, React 19, and TypeScript.
 
 ## 📑 Table of Contents
 
@@ -15,10 +15,6 @@ Modern frontend for the WokiLite restaurant reservation system built with Next.j
 - [🧪 Testing](#-testing)
 - [🔧 Environment Variables](#-environment-variables)
 - [🚀 Deployment](#-deployment)
-- [🎨 UI/UX Highlights](#-uiux-highlights)
-- [🔮 Future Improvements](#-future-improvements)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
 
 ## 🌐 Live Demo
 
@@ -78,14 +74,12 @@ npm start
 
 - **Day View with Date Navigation** - Browse reservations with prev/next buttons and calendar picker
 - **Sector Grouping** - Reservations organized by sectors (Main Hall, Terrace) with visual separation
-- **Server-Side Filtering** - Filter by sector using backend API for better performance
 - **Time Slot Filtering** - Filter reservations by time range (start/end) with 15-minute intervals
 - **Create Reservations** - One-click creation with automatic availability checking and intelligent sector retry
 - **Delete Reservations** - Remove reservations with confirmation dialog
 - **Real-Time Updates** - Automatic cache invalidation with TanStack Query
 - **Toast Notifications** - Non-intrusive feedback with Sonner
 - **Loading & Error States** - Beautiful loading spinners and error alerts with shadcn/ui
-- **Responsive Design** - Mobile-friendly interface with adaptive layouts
 
 ## 🛠 Tech Stack
 
@@ -99,12 +93,7 @@ npm start
 
 - **Tailwind CSS 4** - Utility-first CSS framework
 - **shadcn/ui** - Accessible component library (Calendar, Select, Dialog, Toast, Alert)
-- **Lucide React** - Beautiful icon library
-
-### State Management & Data Fetching
-
-- **TanStack Query v5** - Server state management with intelligent caching
-- **TanStack Query DevTools** - Development debugging tools
+- **Lucide React** - Icon library
 
 ### Utilities
 
@@ -216,27 +205,28 @@ npm run test:ui
 - **jsdom** - DOM environment for tests
 - **@testing-library/jest-dom** - Custom matchers for DOM assertions
 
-### Writing Tests
-
-Tests are located alongside the code they test (e.g., `useReservationsTimeFiltering.test.ts`).
-
-For components that use TanStack Query, use the `renderWithProviders` helper from `@/test/test-utils`:
-
-```typescript
-import { renderWithProviders } from "@/test/test-utils";
-import { MyComponent } from "./MyComponent";
-
-it("renders correctly", () => {
-  const { getByText } = renderWithProviders(<MyComponent />);
-  expect(getByText("Hello")).toBeInTheDocument();
-});
-```
-
 ### Test Coverage
 
-- ✅ Hook testing (`useReservationsTimeFiltering`)
-- 🔄 Component testing (helpers ready)
-- 🔄 Integration testing (helpers ready)
+#### Hooks
+
+- ✅ `useReservationsTimeFiltering` - Time filtering logic with multiple test cases
+
+#### Components
+
+- ✅ `ReservationCard` - Reservation display, singular/plural handling, delete dialog
+- ✅ `TimeSlotFilter` - Time slot selection, filtering logic, clear functionality
+- ✅ `SectorFilter` - Sector selection and rendering
+- ✅ `DeleteReservationDialog` - Confirmation dialog, loading states
+- ✅ `CreateRandomReservationButton` - Button rendering, loading states
+- ✅ `LoadingState` - Loading spinner and message
+- ✅ `ErrorState` - Error message display
+- ✅ `EmptyReservationsMessage` - Empty state messages
+
+### Test Statistics
+
+- **Total Test Files**: 9
+- **Total Tests**: 42+
+- **Coverage**: Core components and hooks tested
 
 ## 🔧 Environment Variables
 
@@ -255,34 +245,3 @@ vercel
 # Set environment variable
 vercel env add NEXT_PUBLIC_API_URL
 ```
-
-## 🎨 UI/UX Highlights
-
-- **Responsive Design** - 1-4 columns based on screen size, mobile-friendly
-- **Hover Effects** - Delete button appears on hover for cleaner interface
-- **Visual Hierarchy** - Sector sections with gradient backgrounds and clear separation
-- **Accessibility** - Keyboard navigation, ARIA labels, focus management, screen reader support
-- **Loading States** - Animated spinners with lucide-react icons
-- **Error States** - Beautiful error alerts with shadcn/ui Alert component
-- **24-Hour Time Format** - Consistent time display across the app
-- **Toast Notifications** - Non-intrusive feedback for user actions
-
-## 🔮 Future Improvements
-
-- [ ] Authentication and user management
-- [ ] Multi-restaurant support
-- [ ] Offline support with service workers
-- [ ] Internationalization (i18n) for multiple languages
-- [ ] Automated test suite
-- [ ] Reservation editing functionality
-- [ ] Advanced filtering options (customer name, party size)
-- [ ] Export reservations to CSV/PDF
-- [ ] Real-time updates via WebSockets
-
-## 🤝 Contributing
-
-This is a challenge project, but suggestions and improvements are welcome! Feel free to open issues or submit pull requests.
-
-## 📄 License
-
-This project is part of the WokiLite challenge.
